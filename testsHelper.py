@@ -12,7 +12,11 @@ class ClassTest:
         return self.x
 
 
+def fn_hren(y=10):
+    return y
+
+
 def fn_test(x):
     x += CONST
-    x *= 2
-    return x
+    x = pow(x, 2)
+    return x + fn_hren()
