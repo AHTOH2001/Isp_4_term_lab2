@@ -1,9 +1,10 @@
+#!usr/bin/python3
+
 import argparse
 import logging
 import os
-import sys
 # from serializers import factory
-from serializers import factory
+from DeSurLib import factory
 
 # import serializers.factory as factory
 # import serializers
@@ -40,11 +41,11 @@ def convert(file_path, new_format):
     with open(file_path, serializer_old.read_type) as fp:
         loaded_obj = serializer_old.load(fp)
 
-    with open(filename + f'.{serializer_new.__class__.__name__.lower()}', serializer_new.write_type) as fp:
+    with open(f'{filename}.{serializer_new.__class__.__name__.lower()}', serializer_new.write_type) as fp:
         serializer_new.dump(loaded_obj, fp)
 
     os.remove(file_path)
-    logging.error('convertations successful!')
+    logging.info('convertation successful!')
 
 
 args = parser.parse_args()

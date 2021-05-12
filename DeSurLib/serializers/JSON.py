@@ -1,7 +1,7 @@
 import json
 
-from serializers.interfaces import Serializer
-from serializers.utils import Simplifier, Constructor
+from DeSurLib.interfaces import Serializer
+from DeSurLib.utils import Simplifier, Constructor
 
 
 # class MyEncoder(json.JSONEncoder):

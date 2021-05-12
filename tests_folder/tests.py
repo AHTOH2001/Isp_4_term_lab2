@@ -1,10 +1,10 @@
 import unittest
-import logging
+import pickle
 
-from serializers import factory, interfaces
+from DeSurLib import utils, factory, interfaces
 import os
 from abc import abstractmethod
-import tests_folder.testsHelper as testsHelper
+import tests_folder.victims_for_tests as testsHelper
 
 
 # import bin.DeSur
@@ -75,7 +75,7 @@ class SerializerTestCase(unittest.TestCase):
 
     def test_function_in_dict(self):
         # init_data = {5: 9, 'x': {'y': {testsHelper.fn_test}}, 'cless': testsHelper.ClassTest}
-        init_data = {'5': 9, 'x': {'y': {testsHelper.fn_test}}}
+        init_data = {'5': 9, 'x': {'y': [testsHelper.fn_test]}}
 
         with open('test_complex.txt', self.write_type) as fp:
             self.suspect.dump(init_data, fp)
@@ -141,8 +141,8 @@ class SerializerTestCase(unittest.TestCase):
         pass
         if os.path.exists('test_class.txt'):
             os.remove('test_class.txt')
-        if os.path.exists('test_complex.txt'):
-            os.remove('test_complex.txt')
+        # if os.path.exists('test_complex.txt'):
+        #     os.remove('test_complex.txt')
         if os.path.exists('test_func.txt'):
             os.remove('test_func.txt')
         if os.path.exists('test_simple.txt'):
@@ -176,8 +176,9 @@ class TestPickle(SerializerTestCase):
 class TestDeSurExecuter(unittest.TestCase):
 
     def setUp(self):
-        self.init_data = {'5': 9, 'x': {'y': {testsHelper.fn_test}}}
-        self.first_serializer = 'json'
+        # self.init_data = {'5': 9, 'x': {'y': {testsHelper.fn_test}}}
+        self.init_data = testsHelper.fn_test
+        self.first_serializer = 'toml'
         self.inst_ser = factory.create_serialzer(self.first_serializer)
 
         with open(f'test_console.{self.first_serializer}', self.inst_ser.write_type) as fp:
@@ -225,7 +226,24 @@ class TestDeSurExecuter(unittest.TestCase):
         with open(f'test_console.pickle', pickle_ser.read_type) as fp:
             actual_res = fp.read()
 
-        self.assertEqual(expected_res, actual_res)
+        # self.assertEqual(expected_res, actual_res)
+        obj1 = utils.Simplifier.simplify_to_json_supported(pickle_ser.loads(expected_res))
+        obj2 = utils.Simplifier.simplify_to_json_supported(pickle_ser.loads(actual_res))
+        self.assertEqual(obj1, obj2)
+
+    def test_interesting(self):
+        # pickle_ser = factory.create_serialzer('pickle')
+        yaml_ser = factory.create_serialzer('yaml')
+        double_ser_obj = yaml_ser.loads(yaml_ser.dumps(self.init_data))
+        simple_init_obj = utils.Simplifier.simplify_to_json_supported(self.init_data)
+        simple_double_obj = utils.Simplifier.simplify_to_json_supported(double_ser_obj)
+        self.assertEqual(simple_init_obj, simple_double_obj)
+        pickle_ser_init = pickle.dumps(simple_init_obj)
+        pickle_ser_double = pickle.dumps(simple_double_obj)
+        simple_deser_init = pickle.loads(pickle_ser_init)
+        simple_deser_double = pickle.loads(pickle_ser_double)
+        self.assertEqual(simple_deser_init, simple_deser_double)
+        self.assertNotEqual(pickle_ser_init, pickle_ser_double)
 
     def test_all_console_serializations(self):
         # raise unittest.SkipTest('Class serialization currently does not work')
@@ -246,6 +264,15 @@ class TestDeSurExecuter(unittest.TestCase):
     def test_double_ser(self):
         # raise unittest.SkipTest('Class serialization currently does not work')
         os.system(f'python bin/DeSur.py --{self.first_serializer} test_console.{self.first_serializer}')
+
+    def test_nonexistent_file(self):
+        os.system(f'python bin/DeSur.py --yaml nonexistent_file.toml')
+
+    def test_wrong_format_file(self):
+        os.system(f'python bin/DeSur.py --yaml test_console.dejavu')
+
+    def test_wrong_format_ser(self):
+        os.system(f'python bin/DeSur.py --hithere test_console.{self.first_serializer}')
 
     # @classmethod
     def tearDown(self):
