@@ -1,8 +1,7 @@
-from interfaces import Serializer
-
-import inspect
 import json
-from utils import Simplifier, Constructor
+
+from serializers.interfaces import Serializer
+from serializers.utils import Simplifier, Constructor
 
 
 # class MyEncoder(json.JSONEncoder):

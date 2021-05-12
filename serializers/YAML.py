@@ -1,17 +1,20 @@
-from interfaces import Serializer
-
 import yaml
+
+from serializers.interfaces import Serializer
+from serializers.utils import Simplifier, Constructor
 
 
 class YAML(Serializer):
     def dump(self, obj, fp):
-        yaml.dump(obj, fp)
+        fp.write(self.dumps(obj))
 
     def dumps(self, obj) -> str:
-        return yaml.dump(obj)
+        dct = Simplifier.simplify_to_json_supported(obj)
+        return yaml.dump(dct)
 
     def load(self, fp):
-        return yaml.load(fp, Loader=yaml.FullLoader)
+        return self.loads(fp.read())
 
     def loads(self, s):
-        return yaml.load(s, Loader=yaml.FullLoader)
+        obj = Constructor.construct_object(yaml.load(s, Loader=yaml.FullLoader))
+        return obj

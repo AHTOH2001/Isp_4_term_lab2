@@ -1,17 +1,20 @@
-from interfaces import Serializer
-
 import toml
+# import pytomlpp as toml
+from serializers.interfaces import Serializer
+from serializers.utils import Simplifier, Constructor
 
 
 class TOML(Serializer):
     def dump(self, obj, fp):
-        toml.dump(obj, fp)
+        fp.write(self.dumps(obj))
 
     def dumps(self, obj) -> str:
-        return toml.dumps(obj)
+        dct = Simplifier.simplify_to_json_supported(obj)
+        return toml.dumps(dct)
 
     def load(self, fp):
-        return toml.load(fp)
+        return self.loads(fp.read())
 
     def loads(self, s):
-        return toml.loads(s)
+        obj = Constructor.construct_object(toml.loads(s))
+        return obj

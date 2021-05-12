@@ -3,7 +3,9 @@ from abc import ABCMeta, abstractmethod
 
 class Serializer:
     __metaclass__ = ABCMeta
-
+    write_type = 'w'
+    read_type = 'r'
+    
     @abstractmethod
     def dump(self, obj, fp):
         raise NotImplementedError('`dump` must be implemented.')

@@ -1,14 +1,14 @@
 import serializers
 
 
-def create_serialzer(name):
-    if name == 'JSON':
+def create_serialzer(name: str):
+    if name.lower() == 'json':
         inst = serializers.JSON()
-    elif name == 'YAML':
+    elif name.lower() == 'yaml':
         inst = serializers.YAML()
-    elif name == 'TOML':
+    elif name.lower() == 'toml':
         inst = serializers.TOML()
-    elif name == 'Pickle':
+    elif name.lower() == 'pickle':
         inst = serializers.Pickle()
     else:
         raise NameError

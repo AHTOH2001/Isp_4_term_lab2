@@ -5,7 +5,6 @@
 import inspect
 import types
 import logging
-import builtins
 
 
 class Simplifier:
@@ -35,7 +34,7 @@ class Simplifier:
 
     @classmethod
     def _simplify_function(cls, fn: object):
-        members = dict(inspect.getmembers(fn))
+        # members = dict(inspect.getmembers(fn))
         result = {
             '__code__': cls.simplify_to_json_supported(getattr(fn, '__code__')),
             '__name__': cls.simplify_to_json_supported(getattr(fn, '__name__')),
@@ -43,6 +42,7 @@ class Simplifier:
             # '__closure__': cls.simplify_to_json_supported(getattr(fn, '__closure__')),
             # '__globals__': {}
         }
+        result['__code__']['co_consts'].pop(0)
         fn_globals = {}
         for var in getattr(fn, '__code__').co_names:
             if var in getattr(fn, '__globals__'):
@@ -81,7 +81,7 @@ class Constructor:
             vars_code['co_stacksize'],
             vars_code['co_flags'],
             bytes(vars_code['co_code']),
-            tuple(vars_code['co_consts']),
+            tuple([None] + vars_code['co_consts']),
             tuple(vars_code['co_names']),
             tuple(vars_code['co_varnames']),
             vars_code['co_filename'],
@@ -92,14 +92,20 @@ class Constructor:
             tuple(vars_code['co_cellvars']),
         )
 
-        fn_globals = data['__globals__']
+        if '__globals__' not in data:
+            fn_globals = {}
+        else:
+            fn_globals = data['__globals__']
         for key, val in fn_globals.items():
             fn_globals[key] = cls.construct_object(val)
         fn_globals['__builtins__'] = __builtins__
         # for var in vars_code.co_names:
         #     if var in getattr(fn, '__globals__'):
         fn_name = data['__name__']
-        fn_defaults = data['__defaults__']
+        if '__defaults__' not in data:
+            fn_defaults = None
+        else:
+            fn_defaults = data['__defaults__']
         if isinstance(fn_defaults, list):
             fn_defaults = tuple(fn_defaults)
         return types.FunctionType(
@@ -115,9 +121,18 @@ class Constructor:
 
     @classmethod
     def _construct_simple(cls, data):
-        return data
+        if isinstance(data, (str, int, bool, type(None), float)):
+            return data
+        elif isinstance(data, list):
+            return [cls.construct_object(el) for el in data]
+        elif isinstance(data, dict):
+            return dict(
+                [(cls.construct_object(key), cls.construct_object(val)) for key, val in
+                 data.items()])
+        else:
+            return data
 
-# CONST = 5
+        # CONST = 5
 #
 #
 # def fn_hren(y=10):
@@ -154,3 +169,4 @@ class Constructor:
 # print(res_deser(15))
 # # x = b'asf'
 # # res = Simplifier.simplify_to_json_supported({x: 6})
+
