@@ -3,11 +3,9 @@
 import argparse
 import logging
 import os
-# from serializers import factory
+
 from DeSurLib import factory
 
-# import serializers.factory as factory
-# import serializers
 
 
 parser = argparse.ArgumentParser(description='Convert file to other format')

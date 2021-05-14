@@ -4,23 +4,6 @@ from DeSurLib.interfaces import Serializer
 from DeSurLib.utils import Simplifier, Constructor
 
 
-# class MyEncoder(json.JSONEncoder):
-#     def default(self, obj):
-#         try:
-#             if not inspect.isbuiltin(obj):
-#                 module = inspect.getmodule(obj)
-#                 if module is not None:
-#                     JSON.code += inspect.getsource(module) + '\n'
-#                     return module.__name__ + '.' + obj.__name__
-#         except OSError:
-#             pass
-#
-#         if isinstance(obj, set):
-#             return '{' + ', '.join((self.default(e) for e in obj)) + '}'
-#
-#         return json.JSONEncoder.default(self, obj)
-
-
 class JSON(Serializer):
 
     def dump(self, obj, fp):

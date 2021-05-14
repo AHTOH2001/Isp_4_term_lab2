@@ -102,8 +102,6 @@ class Constructor:
         for key, val in fn_globals.items():
             fn_globals[key] = cls.construct_object(val)
         fn_globals['__builtins__'] = __builtins__
-        # for var in vars_code.co_names:
-        #     if var in getattr(fn, '__globals__'):
         fn_name = data['__name__']
         if '__defaults__' not in data:
             fn_defaults = None
@@ -120,7 +118,7 @@ class Constructor:
         )
         if 'self' in res_func.__globals__.values():
             res_func.__globals__[res_func.__name__] = res_func
-            
+
         return res_func
 
     @classmethod

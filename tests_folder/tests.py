@@ -4,10 +4,7 @@ import pickle
 from DeSurLib import utils, factory, interfaces
 import os
 from abc import abstractmethod
-import tests_folder.victims_for_tests as testsHelper
-
-
-# import bin.DeSur
+import tests_folder.victims_for_tests as victims
 
 
 class SerializerTestCase(unittest.TestCase):
@@ -36,7 +33,7 @@ class SerializerTestCase(unittest.TestCase):
 
     def test_class(self):
         raise unittest.SkipTest('Class serialization currently does not work')
-        init_data = testsHelper.ClassTest
+        init_data = victims.ClassTest
 
         with open('test_class.txt', self.write_type) as fp:
             self.suspect.dump(init_data, fp)
@@ -75,7 +72,7 @@ class SerializerTestCase(unittest.TestCase):
 
     def test_function_in_dict(self):
         # init_data = {5: 9, 'x': {'y': {testsHelper.fn_test}}, 'cless': testsHelper.ClassTest}
-        init_data = {'5': 9, 'x': {'y': [testsHelper.fn_test]}}
+        init_data = {'5': 9, 'x': {'y': [victims.fn_test]}}
 
         with open('test_complex.txt', self.write_type) as fp:
             self.suspect.dump(init_data, fp)
@@ -99,7 +96,7 @@ class SerializerTestCase(unittest.TestCase):
 
     def test_instance(self):
         raise unittest.SkipTest('Class serialization currently does not work')
-        init_data = testsHelper.ClassTest()
+        init_data = victims.ClassTest()
 
         with open('test_inst.txt', self.write_type) as fp:
             self.suspect.dump(init_data, fp)
@@ -118,7 +115,7 @@ class SerializerTestCase(unittest.TestCase):
             self.assertEqual(self.suspect.dumps(init_data), fp.read())
 
     def test_func(self):
-        init_data = testsHelper.fn_test
+        init_data = victims.fn_test
 
         with open('test_func.txt', self.write_type) as fp:
             self.suspect.dump(init_data, fp)
@@ -137,7 +134,7 @@ class SerializerTestCase(unittest.TestCase):
             self.assertEqual(self.suspect.dumps(init_data), fp.read())
 
     def test_rec_func(self):
-        init_data = testsHelper.fibonachi
+        init_data = victims.fibonachi
 
         with open('test_rec_func.txt', self.write_type) as fp:
             self.suspect.dump(init_data, fp)
@@ -160,14 +157,16 @@ class SerializerTestCase(unittest.TestCase):
         pass
         if os.path.exists('test_class.txt'):
             os.remove('test_class.txt')
-        # if os.path.exists('test_complex.txt'):
-        #     os.remove('test_complex.txt')
+        if os.path.exists('test_complex.txt'):
+            os.remove('test_complex.txt')
         if os.path.exists('test_func.txt'):
             os.remove('test_func.txt')
         if os.path.exists('test_simple.txt'):
             os.remove('test_simple.txt')
         if os.path.exists('test_inst.txt'):
             os.remove('test_inst.txt')
+        if os.path.exists('test_rec_func.txt'):
+            os.remove('test_rec_func.txt')
 
 
 class TestJSON(SerializerTestCase):
@@ -196,7 +195,7 @@ class TestDeSurExecuter(unittest.TestCase):
 
     def setUp(self):
         # self.init_data = {'5': 9, 'x': {'y': {testsHelper.fn_test}}}
-        self.init_data = testsHelper.fn_test
+        self.init_data = victims.fn_test
         self.first_serializer = 'toml'
         self.inst_ser = factory.create_serialzer(self.first_serializer)
 
@@ -293,7 +292,6 @@ class TestDeSurExecuter(unittest.TestCase):
     def test_wrong_format_ser(self):
         os.system(f'python bin/DeSur.py --hithere test_console.{self.first_serializer}')
 
-    # @classmethod
     def tearDown(self):
         pass
         for address, dirs, files in os.walk('.'):
