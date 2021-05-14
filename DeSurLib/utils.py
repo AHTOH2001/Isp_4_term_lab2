@@ -1,10 +1,5 @@
-# from types import
-
-# from mypy.types import NoneType
-# import NoneType
 import inspect
 import types
-import logging
 
 
 class Simplifier:
@@ -21,7 +16,6 @@ class Simplifier:
     @classmethod
     def _simplify_simple(cls, simple_obj: object):
         if isinstance(simple_obj, bytes):
-            # return simple_obj.decode()
             return list(simple_obj)
         elif isinstance(simple_obj, (list, tuple, set)):
             return [cls.simplify_to_json_supported(el) for el in simple_obj]
@@ -34,13 +28,10 @@ class Simplifier:
 
     @classmethod
     def _simplify_function(cls, fn: object):
-        # members = dict(inspect.getmembers(fn))
         result = {
             '__code__': cls.simplify_to_json_supported(getattr(fn, '__code__')),
             '__name__': cls.simplify_to_json_supported(getattr(fn, '__name__')),
             '__defaults__': cls.simplify_to_json_supported(getattr(fn, '__defaults__')),
-            # '__closure__': cls.simplify_to_json_supported(getattr(fn, '__closure__')),
-            # '__globals__': {}
         }
         result['__code__']['co_consts'].pop(0)
         fn_globals = {}
@@ -58,7 +49,6 @@ class Simplifier:
         # members = dict(inspect.getmembers(complex_obj))
         members = dict(filter(lambda member: not hasattr(member[1], '__call__') and member[0] != '__doc__',
                               inspect.getmembers(complex_obj)))
-        # members = dict(filter(lambda member: inspect.isbuiltin(member[1]), inspect.getmembers(complex_obj)))
         # types
         return cls.simplify_to_json_supported(members)
 

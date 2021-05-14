@@ -6,8 +6,6 @@ import os
 
 from DeSurLib import factory
 
-
-
 parser = argparse.ArgumentParser(description='Convert file to other format')
 parser.add_argument('file_path', help='path to the file that will be converted')
 group = parser.add_mutually_exclusive_group(required=True)
