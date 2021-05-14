@@ -136,6 +136,25 @@ class SerializerTestCase(unittest.TestCase):
         with open('test_func.txt', self.read_type) as fp:
             self.assertEqual(self.suspect.dumps(init_data), fp.read())
 
+    def test_rec_func(self):
+        init_data = testsHelper.fibonachi
+
+        with open('test_rec_func.txt', self.write_type) as fp:
+            self.suspect.dump(init_data, fp)
+
+        with open('test_rec_func.txt', self.read_type) as fp:
+            data = self.suspect.load(fp)
+            # self.assertEqual(data, init_data)
+            self.assertEqual(data(6), 8)
+
+        with open('test_rec_func.txt', self.read_type) as fp:
+            data = self.suspect.loads(fp.read())
+            self.assertEqual(data(7), 13)
+            # self.assertEqual(data, init_data)
+
+        with open('test_rec_func.txt', self.read_type) as fp:
+            self.assertEqual(self.suspect.dumps(init_data), fp.read())
+
     @classmethod
     def tearDownClass(cls):
         pass

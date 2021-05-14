@@ -46,7 +46,10 @@ class Simplifier:
         fn_globals = {}
         for var in getattr(fn, '__code__').co_names:
             if var in getattr(fn, '__globals__'):
-                fn_globals[var] = cls.simplify_to_json_supported(getattr(fn, '__globals__')[var])
+                if var == result['__name__']:
+                    fn_globals[var] = 'self'
+                else:
+                    fn_globals[var] = cls.simplify_to_json_supported(getattr(fn, '__globals__')[var])
         result['__globals__'] = fn_globals
         return result
 
@@ -108,12 +111,17 @@ class Constructor:
             fn_defaults = data['__defaults__']
         if isinstance(fn_defaults, list):
             fn_defaults = tuple(fn_defaults)
-        return types.FunctionType(
+
+        res_func = types.FunctionType(
             code=fn_code,
             globals=fn_globals,
             name=fn_name,
             argdefs=fn_defaults
         )
+        if 'self' in res_func.__globals__.values():
+            res_func.__globals__[res_func.__name__] = res_func
+            
+        return res_func
 
     @classmethod
     def _construct_object(cls, data: dict):

@@ -20,3 +20,10 @@ def fn_test(x):
     x += CONST
     x = pow(x, 2)
     return x + fn_hren()
+
+
+def fibonachi(n):
+    if n <= 2:
+        return 1
+    else:
+        return fibonachi(n - 1) + fibonachi(n - 2)
