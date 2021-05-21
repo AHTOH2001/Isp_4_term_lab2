@@ -1,3 +1,5 @@
+import collections
+
 CONST = 5
 
 
@@ -12,14 +14,14 @@ class ClassTest:
         return self.x
 
 
-def fn_hren(y=10):
+def simple_fn(y=10):
     return y
 
 
-def fn_test(x):
+def fn_with_pow_and_sf(x):
     x += CONST
     x = pow(x, 2)
-    return x + fn_hren()
+    return x + simple_fn()
 
 
 def fibonachi(n):
@@ -27,3 +29,7 @@ def fibonachi(n):
         return 1
     else:
         return fibonachi(n - 1) + fibonachi(n - 2)
+
+
+def fn_with_builtin():
+    return collections.deque()

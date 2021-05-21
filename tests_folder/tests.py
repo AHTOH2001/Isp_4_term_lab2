@@ -1,10 +1,11 @@
 import unittest
 import pickle
 
-from DeSurLib import utils, fabric, interfaces
 import os
 from abc import abstractmethod
+
 import tests_folder.victims_for_tests as victims
+from DeSurLib import utils, fabric, interfaces, exceptions
 
 
 class SerializerTestCase(unittest.TestCase):
@@ -72,7 +73,7 @@ class SerializerTestCase(unittest.TestCase):
 
     def test_function_in_dict(self):
         # init_data = {5: 9, 'x': {'y': {testsHelper.fn_test}}, 'cless': testsHelper.ClassTest}
-        init_data = {'5': 9, 'x': {'y': [victims.fn_test]}}
+        init_data = {'5': 9, 'x': {'y': [victims.fn_with_pow_and_sf]}}
 
         with open('test_complex.txt', self.write_type) as fp:
             self.suspect.dump(init_data, fp)
@@ -93,6 +94,24 @@ class SerializerTestCase(unittest.TestCase):
 
         with open('test_complex.txt', self.read_type) as fp:
             self.assertEqual(self.suspect.dumps(init_data), fp.read())
+
+    def test_function_with_builtin(self):
+        init_data = victims.fn_with_builtin
+
+        with open('test_builtin.txt', self.write_type) as fp:
+            try:
+                self.suspect.dump(init_data, fp)
+            except exceptions.SerializationException:
+                pass
+            else:
+                raise exceptions.SerializationException('Exception was not rised')
+
+        try:
+            self.suspect.dumps(init_data)
+        except exceptions.SerializationException:
+            pass
+        else:
+            raise exceptions.SerializationException('Exception was not rised')
 
     def test_instance(self):
         raise unittest.SkipTest('Class serialization currently does not work')
@@ -115,7 +134,7 @@ class SerializerTestCase(unittest.TestCase):
             self.assertEqual(self.suspect.dumps(init_data), fp.read())
 
     def test_func(self):
-        init_data = victims.fn_test
+        init_data = victims.fn_with_pow_and_sf
 
         with open('test_func.txt', self.write_type) as fp:
             self.suspect.dump(init_data, fp)
@@ -152,6 +171,26 @@ class SerializerTestCase(unittest.TestCase):
         with open('test_rec_func.txt', self.read_type) as fp:
             self.assertEqual(self.suspect.dumps(init_data), fp.read())
 
+    def test_error_in_serialized(self):
+        raise unittest.SkipTest()
+        init_data = {'x': [4, 6, 8]}
+
+        with open('test_func.txt', self.write_type) as fp:
+            self.suspect.dump(init_data, fp)
+
+        with open('test_func.txt', self.read_type) as fp:
+            data = self.suspect.load(fp)
+            # self.assertEqual(data, init_data)
+            self.assertEqual(data(15), 410)
+
+        with open('test_func.txt', self.read_type) as fp:
+            data = self.suspect.loads(fp.read())
+            self.assertEqual(data(15), 410)
+            # self.assertEqual(data, init_data)
+
+        with open('test_func.txt', self.read_type) as fp:
+            self.assertEqual(self.suspect.dumps(init_data), fp.read())
+
     @classmethod
     def tearDownClass(cls):
         pass
@@ -167,6 +206,8 @@ class SerializerTestCase(unittest.TestCase):
             os.remove('test_inst.txt')
         if os.path.exists('test_rec_func.txt'):
             os.remove('test_rec_func.txt')
+        if os.path.exists('test_builtin.txt'):
+            os.remove('test_builtin.txt')
 
 
 class TestJSON(SerializerTestCase):
@@ -195,7 +236,7 @@ class TestDeSurExecuter(unittest.TestCase):
 
     def setUp(self):
         # self.init_data = {'5': 9, 'x': {'y': {testsHelper.fn_test}}}
-        self.init_data = victims.fn_test
+        self.init_data = victims.fn_with_pow_and_sf
         self.first_serializer = 'toml'
         self.inst_ser = fabric.create_serialzer(self.first_serializer)
 
