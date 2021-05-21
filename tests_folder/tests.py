@@ -1,7 +1,7 @@
 import unittest
 import pickle
 
-from DeSurLib import utils, factory, interfaces
+from DeSurLib import utils, fabric, interfaces
 import os
 from abc import abstractmethod
 import tests_folder.victims_for_tests as victims
@@ -171,22 +171,22 @@ class SerializerTestCase(unittest.TestCase):
 
 class TestJSON(SerializerTestCase):
     def setUp(self):
-        self.suspect = factory.create_serialzer('JSON')
+        self.suspect = fabric.create_serialzer('JSON')
 
 
 class TestYAML(SerializerTestCase):
     def setUp(self):
-        self.suspect = factory.create_serialzer('YAML')
+        self.suspect = fabric.create_serialzer('YAML')
 
 
 class TestTOML(SerializerTestCase):
     def setUp(self):
-        self.suspect = factory.create_serialzer('TOML')
+        self.suspect = fabric.create_serialzer('TOML')
 
 
 class TestPickle(SerializerTestCase):
     def setUp(self):
-        self.suspect = factory.create_serialzer('Pickle')
+        self.suspect = fabric.create_serialzer('Pickle')
         self.write_type = self.suspect.write_type
         self.read_type = self.suspect.read_type
 
@@ -197,7 +197,7 @@ class TestDeSurExecuter(unittest.TestCase):
         # self.init_data = {'5': 9, 'x': {'y': {testsHelper.fn_test}}}
         self.init_data = victims.fn_test
         self.first_serializer = 'toml'
-        self.inst_ser = factory.create_serialzer(self.first_serializer)
+        self.inst_ser = fabric.create_serialzer(self.first_serializer)
 
         with open(f'test_console.{self.first_serializer}', self.inst_ser.write_type) as fp:
             self.inst_ser.dump(self.init_data, fp)
@@ -205,7 +205,7 @@ class TestDeSurExecuter(unittest.TestCase):
     def test_to_json(self):
         os.system(f'python bin/DeSur.py --json test_console.{self.first_serializer}')
 
-        json_ser = factory.create_serialzer('json')
+        json_ser = fabric.create_serialzer('json')
         expected_res = json_ser.dumps(self.init_data)
 
         with open(f'test_console.json', json_ser.read_type) as fp:
@@ -216,7 +216,7 @@ class TestDeSurExecuter(unittest.TestCase):
     def test_to_yaml(self):
         os.system(f'python bin/DeSur.py --yaml test_console.{self.first_serializer}')
 
-        yaml_ser = factory.create_serialzer('yaml')
+        yaml_ser = fabric.create_serialzer('yaml')
         expected_res = yaml_ser.dumps(self.init_data)
 
         with open(f'test_console.yaml', yaml_ser.read_type) as fp:
@@ -227,7 +227,7 @@ class TestDeSurExecuter(unittest.TestCase):
     def test_to_toml(self):
         os.system(f'python bin/DeSur.py --toml test_console.{self.first_serializer}')
 
-        toml_ser = factory.create_serialzer('toml')
+        toml_ser = fabric.create_serialzer('toml')
         expected_res = toml_ser.dumps(self.init_data)
 
         with open(f'test_console.toml', toml_ser.read_type) as fp:
@@ -238,7 +238,7 @@ class TestDeSurExecuter(unittest.TestCase):
     def test_to_pickle(self):
         os.system(f'python bin/DeSur.py --pickle test_console.{self.first_serializer}')
 
-        pickle_ser = factory.create_serialzer('pickle')
+        pickle_ser = fabric.create_serialzer('pickle')
         expected_res = pickle_ser.dumps(self.init_data)
 
         with open(f'test_console.pickle', pickle_ser.read_type) as fp:
@@ -251,7 +251,7 @@ class TestDeSurExecuter(unittest.TestCase):
 
     def test_interesting(self):
         # pickle_ser = factory.create_serialzer('pickle')
-        yaml_ser = factory.create_serialzer('yaml')
+        yaml_ser = fabric.create_serialzer('yaml')
         double_ser_obj = yaml_ser.loads(yaml_ser.dumps(self.init_data))
         simple_init_obj = utils.Simplifier.simplify_to_json_supported(self.init_data)
         simple_double_obj = utils.Simplifier.simplify_to_json_supported(double_ser_obj)
@@ -280,17 +280,20 @@ class TestDeSurExecuter(unittest.TestCase):
         self.assertEqual(init_serialized_data, res_serialized_data)
 
     def test_double_ser(self):
-        # raise unittest.SkipTest('Class serialization currently does not work')
-        os.system(f'python bin/DeSur.py --{self.first_serializer} test_console.{self.first_serializer}')
+        res = os.system(f'python bin/DeSur.py --{self.first_serializer} test_console.{self.first_serializer}')
+        self.assertEqual(1, res)
 
     def test_nonexistent_file(self):
-        os.system(f'python bin/DeSur.py --yaml nonexistent_file.toml')
+        res = os.system(f'python bin/DeSur.py --yaml nonexistent_file.toml')
+        self.assertEqual(1, res)
 
     def test_wrong_format_file(self):
-        os.system(f'python bin/DeSur.py --yaml test_console.dejavu')
+        res = os.system(f'python bin/DeSur.py --yaml test_console.dejavu')
+        self.assertEqual(1, res)
 
     def test_wrong_format_ser(self):
-        os.system(f'python bin/DeSur.py --hithere test_console.{self.first_serializer}')
+        res = os.system(f'python bin/DeSur.py --hithere test_console.{self.first_serializer}')
+        self.assertEqual(2, res)
 
     def tearDown(self):
         pass

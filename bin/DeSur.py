@@ -3,8 +3,10 @@
 import argparse
 import logging
 import os
+import sys
 
-from DeSurLib import factory
+from DeSurLib import fabric
+
 
 parser = argparse.ArgumentParser(description='Convert file to other format')
 parser.add_argument('file_path', help='path to the file that will be converted')
@@ -20,19 +22,19 @@ group.add_argument('--yaml', '-y', action="store_true")
 def convert(file_path, new_format):
     if not os.path.exists(file_path):
         logging.error(f'file {file_path} not found')
-        return
+        sys.exit(1)
 
     filename, file_extension = os.path.splitext(file_path)
     try:
-        serializer_old = factory.create_serialzer(file_extension[1:])
+        serializer_old = fabric.create_serialzer(file_extension[1:])
     except NameError:
         logging.error('file extension should be one of the supported formats')
-        return
+        sys.exit(1)
 
-    serializer_new = factory.create_serialzer(new_format)
+    serializer_new = fabric.create_serialzer(new_format)
     if serializer_old.__class__ is serializer_new.__class__:
         logging.error('formats are equal, no need to convert')
-        return
+        sys.exit(1)
 
     with open(file_path, serializer_old.read_type) as fp:
         loaded_obj = serializer_old.load(fp)
