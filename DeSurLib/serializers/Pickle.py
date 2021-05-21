@@ -2,6 +2,7 @@ import pickle
 
 from DeSurLib.interfaces import Serializer
 from DeSurLib.utils import Simplifier, Constructor
+from DeSurLib.exceptions import SerializationException, DeSerializationException
 
 
 class Pickle(Serializer):
@@ -14,11 +15,17 @@ class Pickle(Serializer):
 
     def dumps(self, obj):
         dct = Simplifier.simplify_to_json_supported(obj)
-        return pickle.dumps(dct, protocol=0)
+        try:
+            return pickle.dumps(dct, protocol=0)
+        except pickle.PicklingError as e:
+            raise SerializationException(e)
 
     def load(self, fp):
         return self.loads(fp.read())
 
     def loads(self, s):
-        obj = Constructor.construct_object(pickle.loads(s))
+        try:
+            obj = Constructor.construct_object(pickle.loads(s))
+        except pickle.UnpicklingError as e:
+            raise DeSerializationException(e)
         return obj

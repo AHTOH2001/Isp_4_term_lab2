@@ -1,5 +1,7 @@
 import inspect
 import types
+import logging
+from .exceptions import SerializationException
 
 
 class Simplifier:
@@ -8,7 +10,7 @@ class Simplifier:
     def simplify_to_json_supported(cls, obj: object):
         if isinstance(obj, (type(None), int, float, str, list, tuple, bytes, dict, set)):
             return cls._simplify_simple(obj)
-        elif hasattr(obj, '__code__'):
+        elif inspect.isfunction(obj):
             return cls._simplify_function(obj)
         else:
             return cls._simplify_complex(obj)
@@ -40,6 +42,8 @@ class Simplifier:
                 if var == result['__name__']:
                     fn_globals[var] = 'self'
                 else:
+                    if inspect.ismodule(getattr(fn, '__globals__')[var]):
+                        raise SerializationException('Module cannot be serialized')
                     fn_globals[var] = cls.simplify_to_json_supported(getattr(fn, '__globals__')[var])
         result['__globals__'] = fn_globals
         return result
