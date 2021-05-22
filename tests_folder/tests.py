@@ -172,24 +172,20 @@ class SerializerTestCase(unittest.TestCase):
             self.assertEqual(self.suspect.dumps(init_data), fp.read())
 
     def test_error_in_serialized(self):
-        raise unittest.SkipTest()
+        # raise unittest.SkipTest()
         init_data = {'x': [4, 6, 8]}
 
-        with open('test_func.txt', self.write_type) as fp:
-            self.suspect.dump(init_data, fp)
+        ser_data = self.suspect.dumps(init_data)
 
-        with open('test_func.txt', self.read_type) as fp:
-            data = self.suspect.load(fp)
-            # self.assertEqual(data, init_data)
-            self.assertEqual(data(15), 410)
-
-        with open('test_func.txt', self.read_type) as fp:
-            data = self.suspect.loads(fp.read())
-            self.assertEqual(data(15), 410)
-            # self.assertEqual(data, init_data)
-
-        with open('test_func.txt', self.read_type) as fp:
-            self.assertEqual(self.suspect.dumps(init_data), fp.read())
+        try:
+            if self.write_type == 'wb':
+                self.suspect.loads(ser_data[:10])
+            else:
+                self.suspect.loads(ser_data + 'chupakabra')
+        except exceptions.DeSerializationException:
+            pass
+        else:
+            raise exceptions.DeSerializationException('Exception was not rised')
 
     @classmethod
     def tearDownClass(cls):
