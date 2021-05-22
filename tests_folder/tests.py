@@ -318,19 +318,19 @@ class TestDeSurExecuter(unittest.TestCase):
 
     def test_double_ser(self):
         res = os.system(f'python bin/DeSur.py --{self.first_serializer} test_console.{self.first_serializer}')
-        self.assertEqual(1, res)
+        self.assertEqual(256, res)
 
     def test_nonexistent_file(self):
         res = os.system(f'python bin/DeSur.py --yaml nonexistent_file.toml')
-        self.assertEqual(1, res)
+        self.assertEqual(256, res)
 
     def test_wrong_format_file(self):
         res = os.system(f'python bin/DeSur.py --yaml test_console.dejavu')
-        self.assertEqual(1, res)
+        self.assertEqual(256, res)
 
     def test_wrong_format_ser(self):
         res = os.system(f'python bin/DeSur.py --hithere test_console.{self.first_serializer}')
-        self.assertEqual(2, res)
+        self.assertEqual(512, res)
 
     def tearDown(self):
         pass
