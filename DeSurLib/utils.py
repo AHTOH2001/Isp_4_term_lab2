@@ -16,6 +16,10 @@ class Simplifier:
             return cls._simplify_simple(obj)
         elif inspect.isfunction(obj):
             return cls._simplify_function(obj)
+        elif inspect.isclass(obj):
+            raise SerializationException('Class serialization currently does not work')
+        elif inspect.ismodule(obj):
+            raise SerializationException('Module serialization currently does not work')
         else:
             return cls._simplify_complex(obj)
 
